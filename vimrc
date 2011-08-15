@@ -12,7 +12,6 @@ set rtp+=$HOME/config/vim/
 " Set indent options
 set autoindent
 set smartindent
-set list
 
 " Set tab options
 set tabstop=2
