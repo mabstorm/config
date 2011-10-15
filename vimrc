@@ -2,6 +2,14 @@ set nocompatible
 
 filetype off
 
+
+set number
+set mouse=a
+
+" F11 toggle paste mode
+map <F11> :set invpaste<CR>
+set pastetoggle=<F11>
+
 source $HOME/config/vim/colors/wombat.vim
 source $HOME/config/vim/pathogen.vim
 
@@ -48,4 +56,10 @@ call pathogen#infect('~/config/vim/bundle')
 syntax on
 filetype plugin indent on
 
+
 set number
+set mouse=a
+
+" F11 toggle paste mode
+map <F11> :set invpaste<CR>
+set pastetoggle=<F11>
