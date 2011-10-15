@@ -47,3 +47,5 @@ set directory=~/.vim/tmp
 call pathogen#infect('~/config/vim/bundle')
 syntax on
 filetype plugin indent on
+
+set number
