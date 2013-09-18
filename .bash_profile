@@ -1,3 +1,10 @@
+export LC_ALL=en_US.UTF-8
+declare -a CURRENT_PROJECT
+CURRENT_PROJECT[0]='feature/porori_gacha2'
+CURRENT_PROJECT[1]='feature/ranking_gacha'
+CURRENT_PROJECT[2]='feature/event_pvp13'
+export CURRENT_NGCORE="ngcore-sdk-1.11.2.1"
+export CURRENT_JP_NGCORE="ngcore-sdk-1.11.1.6"
 
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
 alias la="ls -laG"
@@ -7,25 +14,237 @@ alias mysqld="/Library/StartupItems/MySQLCOM/MySQLCOM"
 alias kenshuu="cd ~/perl-exam/bailey.michael"
 alias mysql="/usr/local/mysql/bin/mysql"
 alias hossh="ssh training@192.168.56.101"
+alias jerome="ssh jerome@192.168.56.101"
 alias mobasrc="cd /Users/bailey.michael/Downloads/moba-software/moba-0.9.0"
-PATH=$PATH:$HOME/bin:.
-export PATH
 alias mhttpd="sudo /usr/local/apache/bin/apachectl"
-alias bs="cd /Users/bailey.michael/development/BloodBrothersServer"
-alias bs2="cd /Users/bailey.michael/development/BloodBrothersServer2"
-alias bc="cd /Users/bailey.michael/development/ngcore-sdk-1.10.1.3-20130228-g9511a4b/SDK/Apps/BloodBrothers"
-alias bb="cd /Users/bailey.michael/development/ngcore-sdk-1.10.1.3-20130228-g9511a4b/SDK/Apps/BloodBrothers"
-alias bb2="cd /Users/bailey.michael/development/ngcore-sdk-1.10.1.3-20130228-g9511a4b/SDK/Apps/BloodBrothers2"
+
+alias perm="chmod 755 ./*"
+
+export DEV_FOLDER=/Users/bailey.michael/development
+export DEV_SCRIPTS=$DEV_FOLDER/scripts
+PATH=/usr/local/bin:$PATH:$HOME/bin:.:$DEV_FOLDER/android-sdk-macosx/platform-tools:$DEV_FOLDER
+export PATH
+export BB_PATH=$DEV_FOLDER/$CURRENT_NGCORE/SDK/Apps/BloodBrothers
+export BB2_PATH=$DEV_FOLDER/$CURRENT_NGCORE/SDK/Apps/BloodBrothers2
+export BBJP_PATH=$DEV_FOLDER/$CURRENT_JP_NGCORE/SDK/Apps/BloodBrothers
+export BBJP2_PATH=$DEV_FOLDER/$CURRENT_JP_NGCORE/SDK/Apps/BloodBrothers2
+export BS_PATH=$DEV_FOLDER/BloodBrothersServer
+export BS2_PATH=$DEV_FOLDER/BloodBrothersServer2
+
+alias bb="cd $BB_PATH"
+alias bc="cd $BB_PATH"
+alias bb2="cd $BB2_PATH"
+alias bbjp="cd $BBJP_PATH"
+alias bbjp2="cd $BBJP2_PATH"
+alias bs="cd $BS_PATH"
+alias bs2="cd $BS2_PATH"
+alias cddev="cd $DEV_FOLDER"
+alias cdscript="cddev; cd scripts"
+alias cdserv="cdscript; cd servers"
+alias sim="$DEV_FOLDER/$CURRENT_NGCORE/SDK/iOS/Release-iphonesimulator/webgame_US_LIVE_SAND_SDK-iPhone-Simulator.app/Contents/MacOS/Launcher"
+
+alias ebp="vim ~/.bash_profile"
+
+alias gsu="git submodule update"
 alias ,="cd -"
+alias ga="git config --list | grep alias | sed 's/^alias.//' | sed 's/=/	=	/'"
+alias gd="git co develop"
+alias gjp="git co xbd/xbd-jp-2"
+alias gs="git st"
+alias gp="git pull"
+alias gl="git log"
+alias gm="git co master"
+alias gmd="git merge develop"
+
+alias gaj="git add Code/packed_us.js; git add Code/packed_jp.js"
+alias gjson="make pack-json; gaj;"
+alias servthis="cd ngCore; npm link; cd ..; npm link; npm link ngServer;"
+
+alias so="source ~/.bash_profile"
+
+alias pushios="cp build.zip ../../Tools/ngPackager/ ; cd ../../Tools/ngPackager ; ./ngPackager.js -dr --appId Blood-Brothers-iOS --userId takami.kosuke@dena.jp --gamePath ./build.zip"
+alias pushandroid="cp build.zip ../../Tools/ngPackager/ ; cd ../../Tools/ngPackager ; ./ngPackager.js -dr --appId Blood-Brothers-Android --userId takami.kosuke@dena.jp --gamePath ./build.zip"
+
+export SIMFOLDER="~/Library/Application\ Support/iPhone\ Simulator"
+function projects () {
+    for i in "${!CURRENT_PROJECT[@]}"; do 
+      printf "%s\t%s\n" "$i" "${CURRENT_PROJECT[$i]}"
+    done
+}
+
+function cdbb () {
+    cd $DEV_FOLDER/ngcore-sdk-$1/SDK/Apps/BloodBrothers
+}
+function installApp () {
+    region="WW"
+    sdk="6.0"
+    if [ "$1" = "JP" ]
+    then
+        region="JP"
+    fi
+    if [ -z "$2" ]
+    then
+        sdk="6.0"
+    else
+        sdk="$2"
+    fi
+    echo "/bin/cp" "$DEV_FOLDER/backup_launcher/$region/" "$SIMFOLDER/$sdk/"
+    #/bin/cp -r "$DEV_FOLDER""/backup_launcher/""$region""/" "$SIMFOLDER""/""$sdk""/"
+
+}
+function kill-it-with-fire () {
+    switch=0
+    if [ "$1" = "develop" ]
+    then
+        switch='master'
+    else
+        switch='develop'
+    fi
+    git checkout $switch
+    git pull
+    git branch -D $1
+    git checkout -t origin/$1
+}
+
+function git-when () {
+    limit=10
+    if [ "$1" ] ; then
+        if [[ "$1" =~ ^[0-9]+$ ]]
+        then
+            limit=$1
+        fi
+    fi
+    if [ "$2" ] ; then
+        if [[ "$2" =~ ^[0-9]+$ ]]
+        then
+            limit=$2
+        fi
+    fi
+    if [ "$1" = "--local" || "$2" = "--local"]
+    then
+        for k in `git branch|perl -pe s/^..//`;do echo -e `git show --pretty=format:"%Cgreen%ci %Cblue%cr%Creset" $k|head -n 1`\\t$k;done|sort -r -u|head -$limit
+    else
+        for k in `git branch -r|perl -pe s/^..//`;do echo -e `git show --pretty=format:"%Cgreen%ci %Cblue%cr%Creset" $k|head -n 1`\\t$k;done|sort -r -u|head -$limit
+    fi
+
+}
+
 
 bind '"\e[A":history-search-backward'
 bind '"\e[B":history-search-forward'
 
 
+function gn () {
+   value=0
+   if [ $CURRENT_PROJECT ]
+   then
+        if [ $# -gt 0 ]
+        then
+            value=$1
+       else
+            value=0
+        fi
+        echo git checkout ${CURRENT_PROJECT[value]}
+        git co ${CURRENT_PROJECT[value]}
+   else 
+        echo "git checkout develop"
+        git co develop
+   fi
+}
+function gnjp () {
+   if [ $CURRENT_PROJECT ]
+   then
+        if [ $# -gt 0 ]
+        then
+            value=$1
+       else
+            value=0
+        fi
+        echo git checkout ${CURRENT_PROJECT[value]}"_jp"
+        git co ${CURRENT_PROJECT[value]}"_jp"
+   else
+       echo "git checkout xbd/xbd-jp-2"
+       git co xbd/xbd-jp-2
+   fi  
+}
 
+function change-project () {
+    if [ $# -lt 1 ]
+    then
+        echo "provide a project name"
+    else
+        if [ $# -gt 1 ]
+        then
+            CURRENT_PROJECT[$2]=$1
+        else
+            CURRENT_PROJECT[0]=$1
+        fi
+    fi
+}
 
+function make-swap () {
+    echo "Switching in Makefile"
+    /bin/cp "$DEV_SCRIPTS""/Makefile" "$BB_PATH""/Makefile"
+}
 
+function mserv-swap () {
+    if [ $# -lt 1 ]
+    then
+        echo "Usage : {1-5 | 0 (local) | 11-15 | 10 (localJP) }"
+        exit
+    fi
 
+    if [ $1 -lt 10 ]
+    then
+        make toggle-us
+    else
+        make toggle-jp
+    fi
+
+    echo "Switching in serv=$1"
+    /bin/cp "$DEV_SCRIPTS""/servers/config$1"".js" "$BB_PATH""/Config/development.js"
+    echo "make server"
+    make server-debug
+}
+
+function mpj () {
+    if [ "$1" ] ; then
+        make pack-json;
+        mserv-swap 0;
+    else
+        make pack-json;
+    fi
+}
+
+function db-swap () {
+    if [ $# -lt 1 ]
+    then
+        echo "Usage : {1 | 2 | 3 | 4 | 5 | 0 (default) }"
+        exit
+    fi
+
+    echo "Switching in file Database Config: $1"
+    /bin/cp "$DEV_SCRIPTS""/local_db/default$1"".js" "$BS_PATH""/config/default.js"
+}
+
+function run-app () {
+EXEC="$1"
+APPDIR="$HOME/Library/Application Support/\
+    iPhone Simulator/6.0/Applications"
+
+TRCSUB=Contents/Applications/Instruments.app\
+    /Contents/PlugIns/AutomationInstrument.bundle\
+    /Contents/Resources/Automation.tracetemplate
+TOPDIR="$APPDIR/$(appuuid "$EXEC")"
+if [ ! -d "$TOPDIR/$EXEC.app" ]; then
+    echo "runsim: app \"$EXEC\" not installed" >&2
+    exit 1
+fi
+(instruments -D /tmp/runsim$$.trace -t "Applications/Xcode.app/$TRCSUB" \
+        "$TOPDIR/$EXEC.app" < /dev/null 2>&1 > /dev/null | \
+        grep 'xcodebuild -license' >&2 ; \
+    rm -rf /tmp/runsim$$.trace) 
+}
 
 # =============================================================== #
 #
@@ -548,3 +767,12 @@ function ii()   # Get current host related info.
 }
 
 eval `perl -I ~/perl5/lib/perl5 -Mlocal::lib`
+
+##
+# Your previous /Users/bailey.michael/.bash_profile file was backed up as /Users/bailey.michael/.bash_profile.macports-saved_2013-04-30_at_12:43:04
+##
+
+# MacPorts Installer addition on 2013-04-30_at_12:43:04: adding an appropriate PATH variable for use with MacPorts.
+export PATH=/opt/local/bin:/opt/local/sbin:$PATH
+# Finished adapting your PATH environment variable for use with MacPorts.
+
